@@ -1,0 +1,6 @@
+my_venv/
+.env
+project-notes.txt
+migrations/
+gnb-finder-firebase-adminsdk-31h49-bed876ef4e.json
+notes-on-connecting-firebase.txt
