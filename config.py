@@ -5,4 +5,5 @@ class Config():
     FLASK_ENV = os.environ.get('FLASK_ENV') # could hardcode this in as 'development'
     SECRET_KEY = os.environ.get('SECRET_KEY') # make sure we have named this in .env
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') # make sure we have gotten the URL in .env
+    GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
