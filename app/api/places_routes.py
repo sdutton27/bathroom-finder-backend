@@ -9,7 +9,7 @@ GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY')
 
 @api.get('google-places/<string:loc_search>')
 def getPlacesData(loc_search):
-    
+    # https://maps.googleapis.com/maps/api/place/details/json?place_id=ChIJrTLr-GyuEmsRBfy61i59si0&key=YOUR_API_KEY
     url = f'https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input={loc_search}&inputtype=textquery&fields=formatted_address%2Cname%2Crating%2Cphoto%2Cplace_id&key={GOOGLE_API_KEY}'
 
     response = requests.get(url)
@@ -30,7 +30,7 @@ def getPlacesData(loc_search):
 
 @api.get('google-places-photo/<string:photo_reference>')
 def getPlacesPhoto(photo_reference):
-    url = f'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference={photo_reference}&key={GOOGLE_API_KEY}'
+    url = f'https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&maxheight=200&photo_reference={photo_reference}&key={GOOGLE_API_KEY}'
     response = requests.get(url, stream=True)
     
     data = response.raw.data
