@@ -3,7 +3,8 @@ from flask import request
 import requests
 import json
 # we will import some Models here and Authorize the user first. BUT
-
+from ..apiauthhelper import token_auth
+from ..models import Bathroom
 
 @api.get('search-around-loc/<string:lat>/<string:lng>/<string:north>/<string:east>/<string:south>/<string:west>')
 def getBathroomsAroundLoc(lat, lng, north, east, south, west):
@@ -97,3 +98,26 @@ def getBathroomsAroundLoc(lat, lng, north, east, south, west):
         'number_of_results' : len(bathrooms_in_range),
         'results' : bathrooms_in_range,
     }
+
+#     bathroom_id = db.Column(db.Integer, primary_key=True, autoincrement=False)
+#     name = db.Column(db.String(45), nullable=False)
+#     street = db.Column(db.String(45), nullable=False)
+#     city = db.Column(db.String(45), nullable=False)
+#     state = db.Column(db.String(2), nullable=True) --- INCLUDED THIS 
+#     country = db.Column(db.String(15), nullable=False)
+#     accessible = db.Column(db.Boolean, nullable=False)
+#     unisex = db.Column(db.Boolean, nullable=False)
+#     changing_table = db.Column(db.Boolean, nullable=False)
+#     directions = db.Column(db.String(200), nullable=True) --- DID NOT INCLUDE THIS 
+#     latitude = db.Column(db.Float, nullable=False)
+#     longitude = db.Column(db.Float, nullable=False)
+#     rating = db.Column(db.Integer, nullable=True)
+
+@api.post('add-bathroom/<int:bathroom_id>/<string:name>/<string:street>/<string:city>/<string:state>/<string:country>/<string:accessible>/<string:unisex>/<string:changing_table>/<string:latitude>/<string:longitude>/<string:rating>')
+@token_auth.login_required
+def addBathroomAPI(bathroom_id, name, street, city, state, country, accessible, unisex, changing_table, latitude, longitude, rating):
+    pass
+    # try:
+    #     bathroom = Bathroom.query.filter_by(bathroom_id=bathroom_id).first()
+    #     print()
+    # except:

@@ -34,7 +34,7 @@ class User(db.Model):
     google_id = db.Column(db.String(100), nullable=True)
 
     # join table 
-    favorited = db.relationship('Bathroom', secondary='favorite', lazy = True)
+    favorited = db.relationship('Bathroom', secondary='favorite', cascade="all, delete", lazy = True)
 
     def __init__(self, email, password=""):
         self.email = email
@@ -64,13 +64,19 @@ class User(db.Model):
         self.favorited.remove(bathroom)
         db.session.commit()
     
-    def favorites_to_dict(self):
-        faves_dict = {}
-        counter = 1
+    # def favorites_to_dict(self):
+    #     faves_dict = {}
+    #     counter = 1
+    #     for bathroom in self.favorited:
+    #         faves_dict[counter] = bathroom.to_dict()
+    #         counter += 1
+    #     return {'favorites': faves_dict}
+    
+    def favorites_to_list(self):
+        faves_list = []
         for bathroom in self.favorited:
-            faves_dict[counter] = bathroom.to_dict()
-            counter += 1
-        return {'favorites': faves_dict}
+            faves_list.append(bathroom.to_dict())
+        return faves_list
 
     # added this for JSON
     def to_dict(self):
@@ -88,7 +94,7 @@ class User(db.Model):
         }
 
 class Bathroom(db.Model):
-    bathroom_id = db.Column(db.Integer, primary_key=True)
+    bathroom_id = db.Column(db.Integer, primary_key=True, autoincrement=False)
     name = db.Column(db.String(45), nullable=False)
     street = db.Column(db.String(45), nullable=False)
     city = db.Column(db.String(45), nullable=False)
