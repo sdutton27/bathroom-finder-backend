@@ -9,11 +9,11 @@ db = SQLAlchemy()
 # JOIN TABLES: 
 favorite = db.Table('favorite',
     db.Column('user_id', db.Integer, db.ForeignKey('user.user_id'), primary_key=True),
-    db.Column('bathroom_id', db.Integer, db.ForeignKey('bathroom.bathroom_id'), primary_key=True)
+    db.Column('bathroom_id', db.Integer, db.ForeignKey('bathroom.id'), primary_key=True)
 )
 
 bathroom_waypoint = db.Table('bathroom_waypoint',
-    db.Column('bathroom_id', db.Integer, db.ForeignKey('bathroom.bathroom_id'), primary_key=True),
+    db.Column('bathroom_id', db.Integer, db.ForeignKey('bathroom.id'), primary_key=True),
     db.Column('directions_id', db.Integer, db.ForeignKey('directions.directions_id'), primary_key=True)
 )
 
@@ -94,16 +94,17 @@ class User(db.Model):
         }
 
 class Bathroom(db.Model):
-    bathroom_id = db.Column(db.Integer, primary_key=True, autoincrement=False)
-    name = db.Column(db.String(45), nullable=False)
-    street = db.Column(db.String(45), nullable=False)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=False)
+    name = db.Column(db.String(100), nullable=False)
+    street = db.Column(db.String(100), nullable=False)
     city = db.Column(db.String(45), nullable=False)
-    state = db.Column(db.String(2), nullable=True)
+    state = db.Column(db.String(20), nullable=True)
     country = db.Column(db.String(15), nullable=False)
     accessible = db.Column(db.Boolean, nullable=False)
     unisex = db.Column(db.Boolean, nullable=False)
     changing_table = db.Column(db.Boolean, nullable=False)
-    directions = db.Column(db.String(200), nullable=True)
+    comment = db.Column(db.String, nullable=True)
+    directions = db.Column(db.String, nullable=True)
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
     rating = db.Column(db.Integer, nullable=True)
@@ -114,8 +115,9 @@ class Bathroom(db.Model):
     # join table for Bathroom Waypoint 
     on_route = db.relationship('Directions', secondary='bathroom_waypoint', lazy = True)
 
-    def __init__(self, name, street, city, state, country, accessible, unisex, 
-                 changing_table, directions, latitude, longitude, rating):
+    def __init__(self, id, name, street, city, state, country, accessible, unisex, 
+                 changing_table, latitude, longitude, rating, directions, comment):
+        self.id = id
         self.name = name
         self.street = street 
         self.city = city
@@ -128,6 +130,7 @@ class Bathroom(db.Model):
         self.latitude = latitude
         self.longitude = longitude
         self.rating = rating
+        self.comment = comment
 
     def save_to_db(self):
         db.session.add(self)
@@ -142,7 +145,7 @@ class Bathroom(db.Model):
 
     def to_dict(self):
         return {
-            'id':self.bathroom_id,
+            'id':self.id,
             'name': self.name,
             'street': self.street,
             'city': self.city,
@@ -152,6 +155,7 @@ class Bathroom(db.Model):
             'unisex': self.unisex,
             'changing_table': self.changing_table,
             'directions': self.directions,
+            'comment' : self.comment,
             'latitude': self.latitude,
             'longitude': self.longitude,
             'rating': self.rating
@@ -212,7 +216,7 @@ class RecentSearch(db.Model):
     search_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable = False)
     directions_id = db.Column(db.Integer, db.ForeignKey('directions.directions_id'), nullable = True)
-    bathroom_id = db.Column(db.Integer, db.ForeignKey('bathroom.bathroom_id'), nullable = True)
+    bathroom_id = db.Column(db.Integer, db.ForeignKey('bathroom.id'), nullable = True)
 
     # make sure that if you are making a user<->bathroom, that you still put bathroom after "" for directions_id
     def __init__(self, user_id, directions_id="", bathroom_id=""):

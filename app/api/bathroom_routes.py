@@ -113,11 +113,52 @@ def getBathroomsAroundLoc(lat, lng, north, east, south, west):
 #     longitude = db.Column(db.Float, nullable=False)
 #     rating = db.Column(db.Integer, nullable=True)
 
-@api.post('add-bathroom/<int:bathroom_id>/<string:name>/<string:street>/<string:city>/<string:state>/<string:country>/<string:accessible>/<string:unisex>/<string:changing_table>/<string:latitude>/<string:longitude>/<string:rating>')
+# @api.post('add-bathroom/<int:bathroom_id>/<string:name>/<string:street>/<string:city>/<string:state>/<string:country>/<string:accessible>/<string:unisex>/<string:changing_table>/<string:latitude>/<string:longitude>/<string:rating>/<string:directions>/<string:comment>')
+@api.post('bathrooms/add')
 @token_auth.login_required
-def addBathroomAPI(bathroom_id, name, street, city, state, country, accessible, unisex, changing_table, latitude, longitude, rating):
-    pass
+def addBathroomAPI():
+# def addBathroomAPI(bathroom_id, name, street, city, state, country, accessible, unisex, changing_table, 
+# latitude, longitude, rating, directions, comment):
+    # pass
     # try:
     #     bathroom = Bathroom.query.filter_by(bathroom_id=bathroom_id).first()
     #     print()
     # except:
+
+    data = request.json
+    id = data['id']
+    name = data['name']
+    street = data['street']
+    city = data['city']
+    state = data['state']
+    country = data['country']
+    accessible = data['accessible']
+    unisex = data['unisex']
+    changing_table = data['changing_table']
+    latitude = data['latitude']
+    longitude = data['longitude']
+    rating = (data['upvote'] /(data['upvote']  + data['downvote'])) * 5
+    directions = data['directions']
+    comment = data['comment']
+
+    bathroom_in_db = Bathroom.query.get(id)
+    if bathroom_in_db:
+        return {
+            'status' : 'not ok',
+            'message' : 'That bathroom is already in the database.'
+        }
+    else:
+        bathroom = Bathroom(id, name, street, city, state, country, accessible, unisex, changing_table, latitude, longitude, rating, directions, comment)
+        bathroom.save_to_db()
+        # name, street, city, state, country, accessible, unisex, 
+        # changing_table, latitude, longitude, rating
+
+        # user = User(email, password)
+
+        # user.save_to_db()
+        return {
+            'status' : 'ok',
+            'message' : 'Successfully added bathroom to the database.',
+            'bathroom' : bathroom.to_dict()
+        }
+        
