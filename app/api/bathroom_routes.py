@@ -126,6 +126,8 @@ def addBathroomAPI():
     # except:
 
     data = request.json
+    print(data)
+    # data = data['bathroom'] # try this 
     id = data['id']
     name = data['name']
     street = data['street']

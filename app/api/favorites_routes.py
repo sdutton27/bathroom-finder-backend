@@ -32,12 +32,18 @@ def favoriteBathroomAPI(bathroom_id):
 
     if user:
         if bathroom:
-            user.favorite(bathroom) # changes already saved
-            return {
-                'status' : 'ok',
-                'message' : f"Successfully favorited bathroom {bathroom_id}",
-                'favorites' : user.favorites_to_list()
-            }
+            if bathroom in user.favorited:
+                return {
+                    'status' : 'not ok',
+                    'message' : 'Bathroom already in favorites.'
+                }
+            else:
+                user.favorite(bathroom) # changes already saved
+                return {
+                    'status' : 'ok',
+                    'message' : f"Successfully favorited bathroom {bathroom_id}",
+                    'favorites' : user.favorites_to_list()
+                }
         else:
             return {
                 'status' : 'not ok',
@@ -58,12 +64,18 @@ def unfavoriteBathroomAPI(bathroom_id):
 
     if user:
         if bathroom:
-            user.unfavorite(bathroom) # changes already saved
-            return {
-                'status' : 'ok',
-                'message' : f"Successfully unfavorited bathroom {bathroom_id}",
-                'favorites' : user.favorites_to_list()
-            }
+            if bathroom in user.favorited:
+                user.unfavorite(bathroom) # changes already saved
+                return {
+                    'status' : 'ok',
+                    'message' : f"Successfully unfavorited bathroom {bathroom_id}",
+                    'favorites' : user.favorites_to_list()
+                }
+            else:
+                return {
+                    'status' : 'not ok',
+                    'message' : 'Bathroom not in favorites, so cannot unfavorite.'
+                }
         else:
             return {
                 'status' : 'not ok',
