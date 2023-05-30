@@ -57,6 +57,8 @@ def saveRecentSearchBathroomAPI():
             # subquery = RecentSearch.query(func.max(RecentSearch.time_searched)).filter(RecentSearch.search_id == search_id)
             last_searched_bathroom = recent_search.get_latest_search()
 
+            bathroom = Bathroom.query.get(bathroom_id)
+
             print(last_searched_bathroom)
             if (not last_searched_bathroom or last_searched_bathroom['bathroom_id'] != bathroom_id):
                 recent_search.add_searched_bathroom(bathroom_id)
@@ -64,7 +66,10 @@ def saveRecentSearchBathroomAPI():
                 return {
                     'status' : 'ok',
                     'message' : 'Successfully added bathroom to recent search.',
-                    'data' : recent_search.searched_bathrooms_to_list()
+                    'data' : {
+                        'recent_searches' : recent_search.searched_bathrooms_to_list(),
+                        'bathroom' : bathroom.to_dict()
+                    }
                 }
             else:
                 return {

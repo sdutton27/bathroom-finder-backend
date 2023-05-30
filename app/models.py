@@ -314,7 +314,7 @@ class RecentSearch(db.Model):
         db.session.add(bathroom)
         self.searched_bathrooms.append(bathroom)
         # self.bathrooms.append(SearchedBathroom(self.search_id, bathroom_id))
-        db.session.commit()
+        # db.session.commit()
 
     def remove_searched_bathroom(self, bathroom_id):
         # self.searched_bathrooms.remove(bathroom_id)
@@ -323,7 +323,7 @@ class RecentSearch(db.Model):
         bathroom = SearchedBathroom.query.filter_by(bathroom_id = bathroom_id, search_id = self.search_id).first()
         db.session.delete(bathroom)    
         # self.searched_bathrooms.delete().where(self.searched_bathrooms.c.bathroom_id == bathroom_id)
-        db.session.commit()
+        # db.session.commit()
 
     def to_dict(self):
         return {
