@@ -12,10 +12,10 @@ favorite = db.Table('favorite',
     db.Column('bathroom_id', db.Integer, db.ForeignKey('bathroom.id'), primary_key=True)
 )
 
-bathroom_waypoint = db.Table('bathroom_waypoint',
-    db.Column('bathroom_id', db.Integer, db.ForeignKey('bathroom.id'), primary_key=True),
-    db.Column('directions_id', db.Integer, db.ForeignKey('directions.directions_id'), primary_key=True)
-)
+# bathroom_waypoint = db.Table('bathroom_waypoint',
+#     db.Column('bathroom_id', db.Integer, db.ForeignKey('bathroom.id'), primary_key=True),
+#     db.Column('directions_id', db.Integer, db.ForeignKey('directions.directions_id'), primary_key=True)
+# )
 
 
 # this name is actually lowercase
@@ -113,7 +113,18 @@ class Bathroom(db.Model):
     favoriters = db.relationship('User', secondary = 'favorite', overlaps="favorited")
     
     # join table for Bathroom Waypoint 
-    on_route = db.relationship('Directions', secondary='bathroom_waypoint', lazy = True)
+    # on_route = db.relationship('Directions', secondary='bathroom_waypoint', lazy = True)
+
+    # join table for RecentSearch
+    # searched_locs = db.relationship('RecentSearch', secondary='searched_bathroom', overlaps="searched_bathrooms", lazy = True)
+    
+    
+    recent_searches = db.relationship("RecentSearch", secondary="searched_bathroom",
+                                      back_populates="bathrooms", viewonly = True)
+    
+    searched_locs = db.relationship("SearchedBathroom", back_populates="bathroom")
+    # recent_searches = db.relationship("RecentSearch", secondary="searched_bathroom", back_populates="bathrooms")
+
 
     def __init__(self, id, name, street, city, state, country, accessible, unisex, 
                  changing_table, latitude, longitude, rating, directions, comment):
@@ -159,17 +170,123 @@ class Bathroom(db.Model):
             'latitude': self.latitude,
             'longitude': self.longitude,
             'rating': self.rating
+            
         }
     
-class Directions(db.Model):
-    directions_id = db.Column(db.Integer, primary_key=True)
-    origin = db.Column(db.String(100), nullable=False)
-    destination = db.Column(db.String(100), nullable=True) # This can be null if the user just searches for bathrooms around 1 location
+# class Directions(db.Model):
+#     directions_id = db.Column(db.Integer, primary_key=True)
+#     origin = db.Column(db.String(100), nullable=False)
+#     destination = db.Column(db.String(100), nullable=True) # This can be null if the user just searches for bathrooms around 1 location
 
-    # join table for Bathroom Waypoints
-    waypoints = db.relationship('Bathroom', secondary = 'bathroom_waypoint', overlaps="on_route")
+#     # join table for Bathroom Waypoints
+#     waypoints = db.relationship('Bathroom', secondary = 'bathroom_waypoint', overlaps="on_route")
 
-    def __init__(self, origin, destination=""):
+#     def __init__(self, origin, destination=""):
+#         self.origin = origin
+#         self.destination = destination
+
+#     def save_to_db(self):
+#         db.session.add(self)
+#         db.session.commit() 
+
+#     def delete_from_db(self):
+#         db.session.delete(self)
+#         db.session.commit()
+
+#     def save_changes_to_db(self):
+#         db.session.commit()
+
+#     def add_waypoint(self, bathroom):
+#         self.waypoints.append(bathroom)
+#         db.session.commit()
+    
+#     def remove_waypoint(self, bathroom):
+#         self.waypoints.remove(bathroom)
+#         db.session.commit()
+    
+#     def waypoints_to_dict(self):
+#         waypoints_dict = {}
+#         counter = 1
+#         for bathroom in self.waypoints:
+#             waypoints_dict[counter] = bathroom.to_dict()
+#             counter += 1
+#         return {
+#             'origin' : self.origin,
+#             'destination' : self.destination,
+#             'bathroom_waypoints': waypoints_dict
+#         }
+
+#     def to_dict(self):
+#         return {
+#             'directions_id' : self.directions_id,
+#             'origin': self.origin,
+#             'destination' : self.destination
+#         } 
+    
+# class RecentSearch(db.Model):
+#     __tablename__ = 'recent_search'
+#     search_id = db.Column(db.Integer, primary_key=True)
+#     user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable = False)
+#     # directions_id = db.Column(db.Integer, db.ForeignKey('directions.directions_id'), nullable = True)
+#     bathroom_id = db.Column(db.Integer, db.ForeignKey('bathroom.id'), nullable = True)
+
+#     # make sure that if you are making a user<->bathroom, that you still put bathroom after "" for directions_id
+#     def __init__(self, user_id, bathroom_id=""):
+#         self.user_id = user_id
+#         # self.directions_id = directions_id
+#         self.bathroom_id = bathroom_id
+
+#     def save_to_db(self):
+#         db.session.add(self)
+#         db.session.commit() 
+
+#     def delete_from_db(self):
+#         db.session.delete(self)
+#         db.session.commit()
+
+#     def save_changes_to_db(self):
+#         db.session.commit()
+
+#     def to_dict(self):
+#         if self.bathroom_id:
+#             return {
+#                 'user_id' : self.user_id,
+#                 'bathroom_id' : self.bathroom_id
+#             }
+#         # else:
+#         #     return {
+#         #         'user_id' : self.user_id,
+#         #         'directions_id' : self.directions_id
+#         #     }
+
+class RecentSearch(db.Model):
+    search_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable = False)
+    time_searched = db.Column(db.DateTime, nullable = False, default=datetime.utcnow)
+    origin = db.Column(db.String(250), nullable=False)
+    destination = db.Column(db.String(250), nullable=True)
+
+    # TABLE:
+
+    #
+
+    # Paris, France - 9:00PM
+    #     - Target 9:01PM
+    #     - Starbucks 9:00:45PM
+    #     - Antoher Bathroom 9:00:30PM
+    # Berlin, Germany  - 8:00PM
+    #     - Another Bathroom - 8:01PM
+
+    # searched_bathrooms = db.relationship('Bathroom', secondary='searched_bathroom')
+    
+    
+    bathrooms = db.relationship("Bathroom", secondary = "searched_bathroom",
+                                back_populates= "recent_searches", viewonly=True)
+    searched_bathrooms = db.relationship("SearchedBathroom", back_populates="recent_search")
+    # bathrooms = db.relationship("Bathroom", secondary="searched_bathroom", back_populates= "recent_searches")
+
+    def __init__(self, user_id, origin, destination=""):
+        self.user_id = user_id
         self.origin = origin
         self.destination = destination
 
@@ -184,44 +301,60 @@ class Directions(db.Model):
     def save_changes_to_db(self):
         db.session.commit()
 
-    def add_waypoint(self, bathroom):
-        self.waypoints.append(bathroom)
+    def add_searched_bathroom(self, bathroom_id):
+        #self.searched_bathrooms.append(bathroom_id)
+        bathroom = SearchedBathroom(self.search_id, bathroom_id)
+        db.session.add(bathroom)
+        self.searched_bathrooms.append(bathroom)
+        # self.bathrooms.append(SearchedBathroom(self.search_id, bathroom_id))
         db.session.commit()
-    
-    def remove_waypoint(self, bathroom):
-        self.waypoints.remove(bathroom)
+
+    def remove_searched_bathroom(self, bathroom_id):
+        # self.searched_bathrooms.remove(bathroom_id)
+        # not sure if this works
+        # self.searched_bathrooms.remove(SearchedBathroom.query.filter_by(bathroom_id = bathroom_id, search_id = self.search_id).first())
+        bathroom = SearchedBathroom.query.filter_by(bathroom_id = bathroom_id, search_id = self.search_id).first()
+        db.session.delete(bathroom)    
+        # self.searched_bathrooms.delete().where(self.searched_bathrooms.c.bathroom_id == bathroom_id)
         db.session.commit()
-    
-    def waypoints_to_dict(self):
-        waypoints_dict = {}
-        counter = 1
-        for bathroom in self.waypoints:
-            waypoints_dict[counter] = bathroom.to_dict()
-            counter += 1
-        return {
-            'origin' : self.origin,
-            'destination' : self.destination,
-            'bathroom_waypoints': waypoints_dict
-        }
 
     def to_dict(self):
         return {
-            'directions_id' : self.directions_id,
-            'origin': self.origin,
+            'search_id' : self.search_id,
+            'user_id' : self.user_id,
+            'time_searched' : self.time_searched,
+            'origin' : self.origin,
             'destination' : self.destination
-        } 
-    
-class RecentSearch(db.Model):
-    __tablename__ = 'recent_search'
-    search_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable = False)
-    directions_id = db.Column(db.Integer, db.ForeignKey('directions.directions_id'), nullable = True)
-    bathroom_id = db.Column(db.Integer, db.ForeignKey('bathroom.id'), nullable = True)
+        }
+    def searched_bathrooms_to_list(self):
+        bathrooms_list = []
+        for bathroom in self.searched_bathrooms:
+            # print(bathroom_id)
+            # searched_bathroom = SearchedBathroom.query.filter_by(bathroom_id = bathroom_id).first()
+            # print(searched_bathroom)
+            bathrooms_list.append(bathroom.to_dict())
+        return bathrooms_list
+        # return {
+        #     'directions_id' : self.directions_id,
+        #     'origin': self.origin,
+        #     'destination' : self.destination
+        # } 
 
-    # make sure that if you are making a user<->bathroom, that you still put bathroom after "" for directions_id
-    def __init__(self, user_id, directions_id="", bathroom_id=""):
-        self.user_id = user_id
-        self.directions_id = directions_id
+class SearchedBathroom(db.Model):
+    __tablename__ = 'searched_bathroom'
+    
+    searched_bathroom_id = db.Column(db.Integer, primary_key=True)
+    search_id = db.Column(db.Integer, db.ForeignKey('recent_search.search_id'), nullable = False)
+    bathroom_id = db.Column(db.Integer, db.ForeignKey('bathroom.id'), nullable = False)
+    time_searched = db.Column(db.DateTime, nullable = False, default=datetime.utcnow)
+
+    recent_search = db.relationship("RecentSearch", back_populates="searched_bathrooms")
+    bathroom = db.relationship("Bathroom", back_populates="searched_locs")
+    # recent_search = db.relationship("RecentSearch", backref=db.backref("searched_bathroom"), viewonly=True)
+    # bathroom = db.relationship("Bathroom", backref=db.backref("searched_bathroom"), viewonly=True)
+
+    def __init__(self, search_id, bathroom_id):
+        self.search_id = search_id
         self.bathroom_id = bathroom_id
 
     def save_to_db(self):
@@ -234,15 +367,11 @@ class RecentSearch(db.Model):
 
     def save_changes_to_db(self):
         db.session.commit()
-
+    
     def to_dict(self):
-        if self.bathroom_id:
-            return {
-                'user_id' : self.user_id,
-                'bathroom_id' : self.bathroom_id
-            }
-        else:
-            return {
-                'user_id' : self.user_id,
-                'directions_id' : self.directions_id
-            }
+        return {
+            "searched_bathroom_id" : self.searched_bathroom_id,
+            "search_id" : self.search_id,
+            "bathroom_id" : self.bathroom_id,
+            "time_searched" : self.time_searched
+        }
