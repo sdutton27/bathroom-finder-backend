@@ -6,3 +6,4 @@ from . import auth_routes
 from . import bathroom_routes
 from . import places_routes
 from . import favorites_routes 
+from . import recent_search_routes

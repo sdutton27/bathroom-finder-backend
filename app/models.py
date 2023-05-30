@@ -3,8 +3,9 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash
 from secrets import token_hex # this returns a random hex string in hexadecimal
 
-
 db = SQLAlchemy()
+
+
 
 # JOIN TABLES: 
 favorite = db.Table('favorite',
@@ -263,8 +264,11 @@ class RecentSearch(db.Model):
     search_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable = False)
     time_searched = db.Column(db.DateTime, nullable = False, default=datetime.utcnow)
-    origin = db.Column(db.String(250), nullable=False)
-    destination = db.Column(db.String(250), nullable=True)
+    origin_name = db.Column(db.String(50), nullable=False)
+    origin_address = db.Column(db.String(100), nullable=False)
+    photo_base_64 = db.Column(db.String(), nullable=True)
+    destination_name = db.Column(db.String(50), nullable=True)
+    destination_address = db.Column(db.String(100), nullable=True)
 
     # TABLE:
 
@@ -285,10 +289,13 @@ class RecentSearch(db.Model):
     searched_bathrooms = db.relationship("SearchedBathroom", back_populates="recent_search")
     # bathrooms = db.relationship("Bathroom", secondary="searched_bathroom", back_populates= "recent_searches")
 
-    def __init__(self, user_id, origin, destination=""):
+    def __init__(self, user_id, origin_name, origin_address, photo_base_64="", destination_name="", destination_address=""):
         self.user_id = user_id
-        self.origin = origin
-        self.destination = destination
+        self.origin_name = origin_name
+        self.origin_address = origin_address
+        self.destination = destination_name
+        self.destination_address = destination_address
+        self.photo_base_64 = photo_base_64
 
     def save_to_db(self):
         db.session.add(self)
@@ -323,22 +330,36 @@ class RecentSearch(db.Model):
             'search_id' : self.search_id,
             'user_id' : self.user_id,
             'time_searched' : self.time_searched,
-            'origin' : self.origin,
-            'destination' : self.destination
+            'origin_name' : self.origin_name,
+            'origin_address' : self.origin_address,
+            'photo_base_64' : self.photo_base_64,
+            'destination_name' : self.destination_name,
+            'destination_address' : self.destination_address
         }
     def searched_bathrooms_to_list(self):
         bathrooms_list = []
-        for bathroom in self.searched_bathrooms:
+        for entry in self.searched_bathrooms:
             # print(bathroom_id)
             # searched_bathroom = SearchedBathroom.query.filter_by(bathroom_id = bathroom_id).first()
             # print(searched_bathroom)
-            bathrooms_list.append(bathroom.to_dict())
+            bathrooms_list.append(entry.to_dict())
         return bathrooms_list
         # return {
         #     'directions_id' : self.directions_id,
         #     'origin': self.origin,
         #     'destination' : self.destination
         # } 
+
+
+    def get_latest_search(self):
+        list = self.searched_bathrooms_to_list()
+        if list == []:
+            return None
+        else:
+            return max(list, key=lambda x:x['time_searched'])
+        # return max(dVals['items'], key=lambda x:x['age'])
+
+
 
 class SearchedBathroom(db.Model):
     __tablename__ = 'searched_bathroom'

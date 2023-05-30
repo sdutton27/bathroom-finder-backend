@@ -24,6 +24,9 @@ def verify_password(email, password):
 @token_auth.verify_token
 def verify_token(token):
     user = User.query.filter_by(apitoken=token).first()
+    # print("verifying token")
+    # print("token = " + token)
+    # print("user = " + user)
     if user:
         return user # return the valid user
     # if not then let's check if the user is through firebase 
