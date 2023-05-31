@@ -21,6 +21,23 @@ def saveRecentSearchLocAPI():
             destination_name = data['destination_name']
             destination_address = data['destination_address']
             photo_base_64 = data['photo_base_64']
+
+            last_added = RecentSearch.query.order_by(desc(RecentSearch.time_searched)).first()
+            print("This is the last added location: ")
+            print(last_added.to_dict())
+            # if the next search is the same as the last one 
+            print(f"origin_name: {origin_name}\norigin_address: {origin_address}\ndestination_name: {destination_name}\n{destination_address}")
+
+            if (last_added.origin_name == origin_name and last_added.origin_address == origin_address 
+                # and last_added.destination_name == destination_name and last_added.destination_address == destination_address
+                ):
+                return {
+                    'status' : 'not ok',
+                    'message' : 'This location is the same as the last searched.',
+                    'data' : last_added.to_dict()
+                }
+
+
             new_search = RecentSearch(user.user_id, origin_name, origin_address, photo_base_64, destination_name, destination_address)
             new_search.save_to_db()
             return {
