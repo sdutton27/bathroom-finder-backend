@@ -104,6 +104,7 @@ def saveRecentSearchBathroomAPI():
     data = request.json
     if user:
         if data:
+            print(data)
             search_id = data['search_id']
             bathroom_id = data['bathroom_id']
             recent_search = RecentSearch.query.get(search_id)

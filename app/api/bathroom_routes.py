@@ -95,6 +95,8 @@ def getBathroomsAroundLoc(lat, lng, north, east, south, west):
                         else:
                             bathrooms_in_range.append(data[i])
                             i+= 1
+                
+                    # bathrooms_in_range.append(data[i])
                 # go to the next item 
                 # print(i)
                 # print(j)
