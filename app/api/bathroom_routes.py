@@ -49,7 +49,7 @@ def getBathroomsAroundLoc(lat, lng, north, east, south, west):
         
         # print(type(data[0]['latitude']))
 
-        while (i < 26 and i < len(data)) and (j < 100): # goes through up to 26, but limited if the results are under 26
+        while ( i < len(data)) and (i < 100) and j < 37: # goes through up to 26, but limited if the results are under 26
             try:
                 
                 # print('latitude at location : ' + str(data[i]['latitude']))
@@ -80,27 +80,31 @@ def getBathroomsAroundLoc(lat, lng, north, east, south, west):
                 # print(lng_in_range)
                 # print('lat in range:')
                 # print(lat_in_range)
-
+                print(data[i]['name'])
                 # if item is in range, add it to list
                 if lng_in_range and lat_in_range:
-                    # make sure it is not already in the list 
+                    # # make sure it is not already in the list 
                     for bathroom in bathrooms_in_range:
+                        # print(len(bathrooms_in_range))
                         if bathroom['name'] == data[i]['name'] and bathroom['latitude'] == data[i]['latitude'] and bathroom['longitude'] == data[i]['longitude']:
+                            print('bathroom already in list ')
                             break
-                    # couple of edge cases first: 
+                    # # couple of edge cases first: 
                     else:
                         # if no spaces in the street name, it is probably a fake entry
                         if " " not in data[i]['street']:
+                            print(data[i]['name'] + "has bad street: " + data[i]['street'] )
                             pass
                         else:
-                            bathrooms_in_range.append(data[i])
-                            i+= 1
+                        #     bathrooms_in_range.append(data[i])
+                        #     i+= 1
                 
-                    # bathrooms_in_range.append(data[i])
+                            bathrooms_in_range.append(data[i])
+                            j+=1
                 # go to the next item 
                 # print(i)
                 # print(j)
-                j+= 1
+                i+= 1
             except:
                 break # if that was the end of the breakpoint 
         # url = f"https://www.refugerestrooms.org/api/v1/restrooms/by_location?page=1&per_page=10&offset=0&lat={lat}&lng={lng}"
