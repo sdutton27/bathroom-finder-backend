@@ -150,10 +150,14 @@ def addBathroomAPI():
         changing_table = data['changing_table']
         latitude = data['latitude']
         longitude = data['longitude']
-        if (data['upvote']  + data['downvote'] == 0):
-            rating = 0
-        else:
-            rating = (data['upvote'] /(data['upvote']  + data['downvote'])) * 5
+        try:
+            if (data['upvote']  + data['downvote'] == 0):
+                rating = 0
+            else:
+                rating = (data['upvote'] /(data['upvote']  + data['downvote'])) * 5
+        except:
+            rating = data['rating']
+        
         directions = data['directions']
         comment = data['comment']
 

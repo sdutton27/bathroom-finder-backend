@@ -102,3 +102,4 @@ def googleLoginAPI():
         'message' : 'You have successfully created an account.',
         'data': user.to_dict()
     }, 201 # successfully created something
+

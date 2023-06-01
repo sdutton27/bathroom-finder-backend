@@ -123,7 +123,7 @@ class Bathroom(db.Model):
     recent_searches = db.relationship("RecentSearch", secondary="searched_bathroom",
                                       back_populates="bathrooms", viewonly = True)
     
-    searched_locs = db.relationship("SearchedBathroom", back_populates="bathroom")
+    searched_locs = db.relationship("SearchedBathroom", cascade = "all,delete", back_populates="bathroom")
     # recent_searches = db.relationship("RecentSearch", secondary="searched_bathroom", back_populates="bathrooms")
 
 
@@ -286,7 +286,7 @@ class RecentSearch(db.Model):
     
     bathrooms = db.relationship("Bathroom", secondary = "searched_bathroom",
                                 back_populates= "recent_searches", viewonly=True)
-    searched_bathrooms = db.relationship("SearchedBathroom", back_populates="recent_search")
+    searched_bathrooms = db.relationship("SearchedBathroom", back_populates="recent_search", cascade = "all,delete")
     # bathrooms = db.relationship("Bathroom", secondary="searched_bathroom", back_populates= "recent_searches")
 
     def __init__(self, user_id, origin_name, origin_address, photo_base_64="", destination_name="", destination_address=""):
@@ -365,8 +365,8 @@ class SearchedBathroom(db.Model):
     __tablename__ = 'searched_bathroom'
     
     searched_bathroom_id = db.Column(db.Integer, primary_key=True)
-    search_id = db.Column(db.Integer, db.ForeignKey('recent_search.search_id'), nullable = False)
-    bathroom_id = db.Column(db.Integer, db.ForeignKey('bathroom.id'), nullable = False)
+    search_id = db.Column(db.Integer, db.ForeignKey('recent_search.search_id', ondelete='CASCADE'), nullable = False, )
+    bathroom_id = db.Column(db.Integer, db.ForeignKey('bathroom.id', ondelete='CASCADE'), nullable = False)
     time_searched = db.Column(db.DateTime, nullable = False, default=datetime.utcnow)
 
     recent_search = db.relationship("RecentSearch", back_populates="searched_bathrooms")
