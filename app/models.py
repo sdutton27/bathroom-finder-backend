@@ -264,10 +264,10 @@ class RecentSearch(db.Model):
     search_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable = False)
     time_searched = db.Column(db.DateTime, nullable = False, default=datetime.utcnow)
-    origin_name = db.Column(db.String(50), nullable=False)
+    origin_name = db.Column(db.String(100), nullable=False)
     origin_address = db.Column(db.String(100), nullable=False)
     photo_base_64 = db.Column(db.String(), nullable=True)
-    destination_name = db.Column(db.String(50), nullable=True)
+    destination_name = db.Column(db.String(100), nullable=True)
     destination_address = db.Column(db.String(100), nullable=True)
 
     # TABLE:

@@ -154,7 +154,7 @@ def addBathroomAPI():
     # except:
 
         data = request.json
-        # print(data)
+        print(f"bathroom id is : {data['id']}")
         # data = data['bathroom'] # try this 
         id = data['id']
         name = data['name']
@@ -178,8 +178,13 @@ def addBathroomAPI():
         directions = data['directions']
         comment = data['comment']
 
+        # why isn't this working ? 
         bathroom_in_db = Bathroom.query.get(id)
+        print("This is wat bathroom exists with that ID ")
+        print(bathroom_in_db)
+
         if bathroom_in_db:
+            print("BATHROOM SHOULD NOT BE ADDED")
             return {
                 'status' : 'not ok',
                 'message' : 'That bathroom is already in the database.'
